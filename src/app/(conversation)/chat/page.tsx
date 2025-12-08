@@ -181,19 +181,23 @@ const ChatContent = () => {
                   return (
                     <motion.div
                       key={chat.id}
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ duration: 0.2 }}
+                      transition={{ 
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 20
+                      }}
                       className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[75%] rounded-2xl p-3 px-4 shadow-sm ${
+                        className={`max-w-[75%] px-5 py-3 shadow-md ${
                           isMe
-                            ? 'bg-gradient-to-br from-primary to-violet-600 text-white rounded-br-none shadow-primary/20'
-                            : 'glass-panel bg-white/5 text-gray-100 rounded-bl-none border-white/5'
+                            ? 'bg-white text-gray-900 rounded-[24px] rounded-br-[4px]'
+                            : 'bg-primary/60 backdrop-blur-md text-white rounded-[24px] rounded-bl-[4px] border border-white/10'
                         }`}
                       >
-                        <p className="text-sm leading-relaxed">{chat.message}</p>
+                        <p className="text-[15px] leading-relaxed font-medium">{chat.message}</p>
                       </div>
                     </motion.div>
                   );
@@ -219,10 +223,10 @@ const ChatContent = () => {
                 value={data.message}
                 onChange={handleChange}
                 placeholder="Type your message..."
-                className="flex-1 bg-white/5 border-white/10 hover:border-primary/50 focus:border-primary transition-all"
+                className="flex-1 bg-white/5 border-white/10 hover:border-primary/50 focus:border-primary transition-all rounded-full"
                 autoComplete="off"
               />
-              <Button type="submit" variant="primary" className="px-5 rounded-xl">
+              <Button type="submit" variant="primary" className="px-5 rounded-full">
                 <Send className="h-5 w-5" />
               </Button>
             </form>
