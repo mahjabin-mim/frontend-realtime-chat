@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background-rgb: 10, 10, 20;
-  --foreground-rgb: 230, 230, 250;
+  --background-rgb: 5, 5, 10; /* Deep Void Black */
+  --foreground-rgb: 255, 255, 255;
   
-  --primary-rgb: 124, 58, 237; /* Electric Violet */
-  --secondary-rgb: 6, 182, 212; /* Cyan */
+  --primary-rgb: 139, 92, 246; /* Vibrant Violet */
+  --secondary-rgb: 56, 189, 248; /* Sky Blue */
   --accent-rgb: 236, 72, 153; /* Pink */
   
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-bg-hover: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg-hover: rgba(255, 255, 255, 0.08);
 }
 
 body {
@@ -25,19 +25,20 @@ body {
 @layer utilities {
   .glass-panel {
     background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   }
 
   .text-gradient {
-    background: linear-gradient(to right, rgb(var(--primary-rgb)), rgb(var(--secondary-rgb)));
+    background: linear-gradient(to right, #c084fc, #6366f1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   
   .bg-gradient-cosmic {
-    background: linear-gradient(135deg, rgb(var(--background-rgb)) 0%, #1a1a2e 100%);
+    background: radial-gradient(circle at 50% -20%, #4c1d95 0%, #0f172a 40%, #020617 100%);
+    background-attachment: fixed;
   }
 }
