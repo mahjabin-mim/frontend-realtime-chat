@@ -1,8 +1,12 @@
-"use client"
+"use client";
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Search, User } from 'lucide-react';
 
 interface User {
   id: number;
@@ -21,7 +25,8 @@ interface DecodedToken {
 
 const ConversationList = () => {
     const [users, setUsers] = useState<User[]>([]);
-    //const [loading, setLoading] = useState(true);
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const router = useRouter();
     const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
 
@@ -36,15 +41,11 @@ const ConversationList = () => {
 
     useEffect(() => {
         const token = Cookies.get('authToken');
-        console.log("Token from cookies:", token); 
         if (token) {
           try {
             const decodedToken: DecodedToken = jwtDecode(token);
-            console.log("Decoded token:", decodedToken); 
             if (decodedToken.email) {
               setLoggedInUserEmail(decodedToken.email);
-            } else {
-              console.error('Email field not found in token');
             }
           } catch (error) {
             console.error("Error decoding token:", error);
@@ -61,98 +62,95 @@ const ConversationList = () => {
             });
             if (handleResponse(res)) {
               const result = await res.json();
-              console.log("Fetched users:", result);
               if (loggedInUserEmail) {
-                const filteredUsers = result.filter((user: User) => user.email !== loggedInUserEmail);
-                setUsers(filteredUsers);
-              } else {
-                console.log("loggedInUser not found");
+                const filtered = result.filter((user: User) => user.email !== loggedInUserEmail);
+                setUsers(filtered);
+                setFilteredUsers(filtered);
               }
             } else {
-              alert("Login Expired");
-              router.push('/userLogin');
+              // Handle error
             }
           } catch (error) {
             console.error('Error fetching users:', error);
           } 
-        //   finally {
-        //     setLoading(false);
-        //   }
         };
-        //fetchLoggedInUser()
         fetchData();
       }, [loggedInUserEmail]);
-      
-    //   if (loading) {
-    //     return <div>Loading...</div>;
-    //   }
 
-    // const handleStartChat = async (userId: number) => {
-    //     try {
-    //       const token = Cookies.get('authToken');
-    //       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversation/create`, {
-    //         method: 'POST',
-    //         headers: {
-    //           'Authorization': `Bearer ${token}`,
-    //           'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify({
-    //           name : "",
-    //           users: [userId]
-    //         })
-    //       });
-
-    //       if (handleResponse(res)) {
-    //         const conversation = await res.json();
-    //         console.log('Conversation created:', conversation);
-    //         alert("Conversation created");
-    //       } else {
-    //         alert("Failed to start chat");
-    //       }
-    //     } catch (error) {
-    //       console.error('Error starting chat:', error);
-    //     }
-    // };
-
-    const handleStartChat = (userEmail: string) => {
-      router.push(`/chat?userEmail=${userEmail}`);
-    };
+    useEffect(() => {
+        if (searchQuery) {
+            setFilteredUsers(users.filter(user => 
+                user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                user.email.toLowerCase().includes(searchQuery.toLowerCase())
+            ));
+        } else {
+            setFilteredUsers(users);
+        }
+    }, [searchQuery, users]);
 
     const handleConversationClick = (userEmail: string) => {
-        router.push(`/conversation?userEmail=${userEmail}`);
+        // Directing to /chat as per previous file logic
+        // Note: The original file had a difference between handleStartChat and handleConversationClick
+        // One went to /chat, the other to /conversation. 
+        // Assuming we want the chat interface we redesigned:
+        router.push(`/chat?userEmail=${userEmail}`);
       };
 
     return (
-    <>
-        <div className="container mx-auto p-4 min-w-80">
-            <h1 className="text-2xl font-bold mb-4 ml-4">Chat</h1>
-            {/* <div className="container mx-auto p-4 min-w-80 flex items-center">
-                <h1 className="text-2xl font-bold mr-4">Chat</h1>
-                <div className="flex-grow">
-                    <input
-                    type="text"
-                    placeholder="Search"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    />
-                </div>
-            </div> */}
-            <div className="overflow-y-auto h-96">
-                <ul>
-                {users.map((user) => (
-                    <li
-                    key={user.email}
-                    className="p-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleConversationClick(user.email)}
-                    >
-                    <div className="font-bold">{user.name}</div>
-                    <div className="text-gray-600">{user.email}</div>
-                    </li>
-                ))}
-                </ul>
-            </div>
-        </div>
-    </>
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full h-full flex flex-col p-4 md:p-6"
+        >
+            <Card className="border-white/10 shadow-2xl bg-black/40 backdrop-blur-xl flex-1 flex flex-col overflow-hidden">
+                <CardHeader className="border-b border-white/5 pb-6">
+                    <CardTitle className="text-2xl font-bold text-center mb-4">Messages</CardTitle>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input 
+                            placeholder="Search users..." 
+                            className="pl-10 bg-white/5 border-white/10 focus:border-primary/50"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                    <div className="grid gap-3">
+                        <AnimatePresence>
+                            {filteredUsers.map((user, index) => (
+                                <motion.div
+                                    key={user.email}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    onClick={() => handleConversationClick(user.email)}
+                                    className="p-3 rounded-xl glass-panel bg-white/5 hover:bg-white/10 transition-all cursor-pointer border-transparent hover:border-primary/30 group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-primary/40 transition-shadow">
+                                            {user.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-semibold text-white group-hover:text-primary transition-colors truncate">{user.name}</h3>
+                                            <p className="text-xs text-white/50 truncate">{user.email}</p>
+                                        </div>
+                                        <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)] shrink-0"></div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                        {filteredUsers.length === 0 && (
+                            <div className="text-center text-white/40 mt-10">
+                                <User className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                                <p>No users found</p>
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
     );
 };
 
-export default ConversationList
+export default ConversationList;

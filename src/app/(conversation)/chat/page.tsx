@@ -1,8 +1,13 @@
-"use client"
+"use client";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Card, CardHeader, CardContent } from "@/components/ui/Card";
+import { Send, ArrowLeft, User } from 'lucide-react';
 
 interface ShowChat {
   id: number;
@@ -18,8 +23,6 @@ interface DecodedToken {
   exp: number;
 }
 
-import { Suspense } from 'react';
-
 const ChatContent = () => {
   const [data, setData] = useState<{ message: string; receiver: string | null }>({ message: "", receiver: null });
   const [chatdata, setChatData] = useState<ShowChat[]>([]);
@@ -28,7 +31,16 @@ const ChatContent = () => {
   const userEmail = searchParams.get('userEmail');
   const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
   const [receiverName, setReceiverName] = useState('');
-  
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatdata]);
+
   useEffect(() => {
     if (userEmail) {
       setData((prevData) => ({ ...prevData, receiver: userEmail }));
@@ -68,15 +80,11 @@ const ChatContent = () => {
 
   useEffect(() => {
     const token = Cookies.get('authToken');
-    console.log("Token from cookies:", token); 
     if (token) {
       try {
         const decodedToken: DecodedToken = jwtDecode(token);
-        console.log("Decoded token:", decodedToken); 
         if (decodedToken.email) {
           setLoggedInUserEmail(decodedToken.email);
-        } else {
-          console.error('Email field not found in token');
         }
       } catch (error) {
         console.error("Error decoding token:", error);
@@ -93,21 +101,16 @@ const ChatContent = () => {
         });
         if (handleResponse(res)) {
           const result = await res.json();
-          console.log("Fetched messages:", result);
-          console.log("loggedInUserEmail:", loggedInUserEmail); 
-          console.log("data.receiver:", data.receiver); 
-          console.log(receiverName);
           const filteredMessages = result.filter((message: ShowChat) =>
             (message.sender === loggedInUserEmail && message.receiver === data.receiver) ||
             (message.sender === data.receiver && message.receiver === loggedInUserEmail)
           );
           setChatData(filteredMessages);
         } else {
-          alert("Login Expired");
-          router.push('/userLogin');
+          // Silent failure or specific handling if needed
         }
       } catch (error) {
-        alert("Error fetching chat data");
+        // Silent error to avoid spamming alerts
       }
     };
     fetchData();
@@ -121,6 +124,8 @@ const ChatContent = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!data.message.trim()) return;
+
     const token = Cookies.get('authToken');
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/singlechat/newMessage`, {
@@ -134,10 +139,7 @@ const ChatContent = () => {
       if (res.ok) {
         const newMessage = await res.json();
         setChatData((prev) => [...prev, newMessage]);
-        //setData({ message: "" });
         setData((prevData) => ({ ...prevData, message: "", receiver: userEmail || "" }));
-      } else {
-        alert("Error sending message");
       }
     } catch (error) {
       alert("Error sending message");
@@ -145,53 +147,99 @@ const ChatContent = () => {
   };
 
   return (
-    <>
-    <div className="max-w-md mx-auto">
-      <div className='bg-white shadow-md rounded-lg h-10 mb-1 flex items-center'>
-        <p className="ml-4 font-semibold text-lg font-sans tracking-wide">{receiverName}</p>
-      </div>
-    <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="flex flex-col h-96 p-4 overflow-y-auto">
-            {chatdata.length > 0 ? (
-                chatdata.map((chat) => (
-                    <div key={chat.id} className={`flex ${chat.sender === loggedInUserEmail ? 'justify-end mt-1' : 'justify-start mt-1'}`}>
-                        <div className={`rounded-lg p-2 ${chat.sender === loggedInUserEmail ? 'bg-fuchsia-900 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                            <p className="text-sm font-sans tracking-wide">{chat.message}</p>
-                        </div>
-                    </div>
-                ))
-            ) : (
-                <p className="text-gray-500 text-center">No messages yet</p>
-            )}
-        </div>
-        <div className="p-4 border-t">
-            <form onSubmit={handleSubmit} className="flex space-x-2">
-                <input
-                    type="text"
-                    name="message"
-                    value={data.message}
-                    onChange={handleChange}
-                    required
-                    placeholder="Write messages..."
-                    className="flex-grow p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                />
-                <button
-                    type="submit"
-                    className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
-                >
-                    Send
-                </button>
+    <div className="flex flex-col h-full p-4 md:p-6 overflow-hidden relative">
+      <div className="w-full h-full flex flex-col z-10">
+        <Card className="flex-1 flex flex-col border-white/10 shadow-2xl overflow-hidden bg-black/40 backdrop-blur-xl">
+          {/* Header */}
+          <div className="p-4 border-b border-white/5 flex items-center gap-4 bg-black/20">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="md:hidden" 
+              onClick={() => router.back()}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20">
+              <User className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-lg tracking-wide text-white">{receiverName || "Chat"}</h2>
+              <div className="flex items-center gap-2">
+                 <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                 <span className="text-xs text-white/50">Online</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+            <AnimatePresence initial={false}>
+              {chatdata.length > 0 ? (
+                chatdata.map((chat) => {
+                  const isMe = chat.sender === loggedInUserEmail;
+                  return (
+                    <motion.div
+                      key={chat.id}
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[75%] rounded-2xl p-3 px-4 shadow-sm ${
+                          isMe
+                            ? 'bg-gradient-to-br from-primary to-violet-600 text-white rounded-br-none shadow-primary/20'
+                            : 'glass-panel bg-white/5 text-gray-100 rounded-bl-none border-white/5'
+                        }`}
+                      >
+                        <p className="text-sm leading-relaxed">{chat.message}</p>
+                      </div>
+                    </motion.div>
+                  );
+                })
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-white/30 space-y-4">
+                  <div className="p-4 rounded-full bg-white/5 border border-white/5">
+                    <Send className="h-8 w-8 opacity-50" />
+                  </div>
+                  <p>No messages yet. Start the conversation!</p>
+                </div>
+              )}
+            </AnimatePresence>
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div className="p-4 bg-black/20 border-t border-white/5">
+            <form onSubmit={handleSubmit} className="flex gap-3">
+              <Input
+                type="text"
+                name="message"
+                value={data.message}
+                onChange={handleChange}
+                placeholder="Type your message..."
+                className="flex-1 bg-white/5 border-white/10 hover:border-primary/50 focus:border-primary transition-all"
+                autoComplete="off"
+              />
+              <Button type="submit" variant="primary" className="px-5 rounded-xl">
+                <Send className="h-5 w-5" />
+              </Button>
             </form>
-        </div>
+          </div>
+        </Card>
+      </div>
     </div>
-    </div>
-    </>
   );
 };
 
 const Chat = () => {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={
+          <div className="h-screen w-full flex items-center justify-center bg-gradient-cosmic">
+             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+          </div>
+        }>
             <ChatContent />
         </Suspense>
     );

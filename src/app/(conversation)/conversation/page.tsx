@@ -1,48 +1,68 @@
-"use client"
+"use client";
+
 import LogoutButton from "@/app/(components)/logoutButton/page";
-import Chat from "../chat/page"
-import ConversationList from "../conversationList/page"
+import Chat from "../chat/page";
+import ConversationList from "../conversationList/page";
 import { useSearchParams } from "next/navigation";
 import LoggedInUser from "@/app/(components)/loggedInUser/page";
-
 import { Suspense } from 'react';
+import { Card } from "@/components/ui/Card";
+import { LogOut, LayoutDashboard } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 const ConversationContent = () => {
     const searchParams = useSearchParams();
     const userEmail = searchParams.get('userEmail');
-    return(
-        <>
-            <div className='flex justify-end mb-6'>
-                <div className='flex justify-end items-center space-x-1 mt-6 mr-6'>
-                    <p className="text-blue-600">welcome,</p>
-                    <p className="text-blue-600"> <LoggedInUser/></p>
-        
+
+    return (
+        <div className="flex h-screen w-full relative z-10 p-4 gap-4">
+            {/* Sidebar / List */}
+            <div className="w-1/3 min-w-[320px] hidden md:block h-full">
+                <ConversationList />
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 h-full flex flex-col gap-4">
+                {/* Top Navigation Bar */}
+                <div className="h-16 glass-panel rounded-xl flex items-center justify-between px-6 bg-black/20">
+                    <div className="flex items-center gap-2">
+                         <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                            <LayoutDashboard size={20} />
+                         </div>
+                         <div className="text-sm">
+                            <span className="opacity-60">Welcome, </span>
+                            <span className="font-semibold text-primary"><LoggedInUser/></span>
+                         </div>
+                    </div>
+                    <div className="flex items-center">
+                         <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
+                             <LogoutButton />
+                         </Button>
+                    </div>
                 </div>
-                <div className='flex justify-end items-center space-x-2 mt-6 mr-6'>
-                    <LogoutButton/>
+
+                {/* Chat or Placeholder */}
+                <div className="flex-1 overflow-hidden relative rounded-2xl glass-panel bg-black/40 border-white/5 shadow-2xl">
+                    {userEmail ? (
+                        <Chat />
+                    ) : (
+                        <div className="absolute inset-0 flex items-center justify-center flex-col text-white/30">
+                            <div className="h-32 w-32 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 blur-3xl mb-4" />
+                            <p className="text-lg font-light">Select a conversation to start chatting</p>
+                        </div>
+                    )}
                 </div>
             </div>
-            <div className="flex min-w-fit bg-slate-50">
-                <div className="w-1/3">
-                    <ConversationList />
-                </div>
-                <div className="w-2/3 p-4">
-                    {userEmail ? <Chat /> : <div className="text-center text-gray-500 mt-32">No conversation selected</div>}
-                </div>
-            </div>
-            {/* <div className="flex justify-end mt-2 mr-10">
-                <BackButton/>
-            </div> */}
-        </>
-    )
-}
+        </div>
+    );
+};
 
 const Conversation = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center text-primary animate-pulse">Loading Cosmic Interface...</div>}>
       <ConversationContent />
     </Suspense>
   );
 };
 
-export default Conversation
+export default Conversation;
