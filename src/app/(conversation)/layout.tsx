@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 
 export default function ConversationLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative min-h-screen bg-gradient-cosmic text-foreground overflow-hidden font-sans">
+    <div className="relative h-screen bg-gradient-cosmic text-foreground overflow-hidden font-sans">
         {/* Background Elements */}
         {/* Background Elements - Glowing Orb */}
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[80%] h-[60%] rounded-full bg-primary/20 blur-[150px] pointer-events-none" />

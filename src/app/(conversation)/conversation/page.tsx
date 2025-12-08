@@ -15,7 +15,7 @@ const ConversationContent = () => {
     const userEmail = searchParams.get('userEmail');
 
     return (
-        <div className="flex flex-col h-full w-full relative z-10 p-4 gap-4">
+        <div className="flex flex-col h-[calc(100vh-4rem)] w-full relative z-10 p-4 gap-4">
             {/* Main Content Area - Split View */}
             <div className="flex-1 flex gap-4 overflow-hidden rounded-2xl glass-panel bg-black/40 border-white/5 shadow-2xl p-4">
                 {/* Sidebar / List */}
