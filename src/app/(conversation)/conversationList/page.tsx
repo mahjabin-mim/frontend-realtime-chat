@@ -89,11 +89,8 @@ const ConversationList = () => {
     }, [searchQuery, users]);
 
     const handleConversationClick = (userEmail: string) => {
-        // Directing to /chat as per previous file logic
-        // Note: The original file had a difference between handleStartChat and handleConversationClick
-        // One went to /chat, the other to /conversation. 
-        // Assuming we want the chat interface we redesigned:
-        router.push(`/chat?userEmail=${userEmail}`);
+        // Redesigned navigation: Stay on /conversation to keep split view
+        router.push(`/conversation?userEmail=${userEmail}`);
       };
 
     return (
