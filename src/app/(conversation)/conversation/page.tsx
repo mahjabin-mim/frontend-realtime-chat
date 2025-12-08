@@ -15,34 +15,29 @@ const ConversationContent = () => {
     const userEmail = searchParams.get('userEmail');
 
     return (
-        <div className="flex h-screen w-full relative z-10 p-4 gap-4">
-            {/* Sidebar / List */}
-            <div className="w-1/3 min-w-[320px] hidden md:block h-full">
-                <ConversationList />
+        <div className="flex flex-col h-screen w-full relative z-10 p-4 gap-4">
+             {/* Top Navigation Bar - Now at the very top */}
+             <div className="h-16 flex items-center justify-end px-6">
+                <div className="flex items-center gap-4">
+                     <div className="text-sm text-right">
+                        <span className="opacity-60 text-white">welcome, </span>
+                        <span className="font-semibold text-primary"><LoggedInUser/></span>
+                     </div>
+                     <Button variant="primary" size="sm" className="bg-red-500 hover:bg-red-600 text-white border-0 shadow-lg shadow-red-500/20">
+                         <LogoutButton />
+                     </Button>
+                </div>
             </div>
 
-            {/* Main Content Area */}
-            <div className="flex-1 h-full flex flex-col gap-4">
-                {/* Top Navigation Bar */}
-                <div className="h-16 glass-panel rounded-xl flex items-center justify-between px-6 bg-black/20">
-                    <div className="flex items-center gap-2">
-                         <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
-                            <LayoutDashboard size={20} />
-                         </div>
-                         <div className="text-sm">
-                            <span className="opacity-60">Welcome, </span>
-                            <span className="font-semibold text-primary"><LoggedInUser/></span>
-                         </div>
-                    </div>
-                    <div className="flex items-center">
-                         <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
-                             <LogoutButton />
-                         </Button>
-                    </div>
+            {/* Main Content Area - Split View */}
+            <div className="flex-1 flex gap-4 overflow-hidden rounded-2xl glass-panel bg-black/40 border-white/5 shadow-2xl p-4">
+                {/* Sidebar / List */}
+                <div className="w-1/3 min-w-[320px] hidden md:block h-full border-r border-white/5 pr-4">
+                    <ConversationList />
                 </div>
 
                 {/* Chat or Placeholder */}
-                <div className="flex-1 overflow-hidden relative rounded-2xl glass-panel bg-black/40 border-white/5 shadow-2xl">
+                <div className="flex-1 h-full flex flex-col relative">
                     {userEmail ? (
                         <Chat />
                     ) : (

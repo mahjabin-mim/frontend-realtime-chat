@@ -103,8 +103,8 @@ const ConversationList = () => {
             className="w-full h-full flex flex-col p-4 md:p-6"
         >
             <Card className="border-white/10 shadow-2xl bg-black/40 backdrop-blur-xl flex-1 flex flex-col overflow-hidden">
-                <CardHeader className="border-b border-white/5 pb-6">
-                    <CardTitle className="text-2xl font-bold text-center mb-4">Messages</CardTitle>
+                <CardHeader className="border-b border-white/5 pb-6 px-0">
+                    <CardTitle className="text-2xl font-bold text-left mb-4">Chat</CardTitle>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input 
