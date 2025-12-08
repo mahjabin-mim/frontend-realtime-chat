@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 
 export default function Navbar() {
   return (
-    <div className="h-16 flex items-center justify-end px-6 absolute top-0 right-0 z-50 w-full pointer-events-none">
+    <div className="h-16 flex items-center justify-end px-6 fixed top-0 right-0 z-50 w-full pointer-events-none">
       <div className="flex items-center gap-4 pointer-events-auto">
         <div className="text-sm text-right">
           <span className="opacity-60 text-white">welcome, </span>

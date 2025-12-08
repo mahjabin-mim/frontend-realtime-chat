@@ -191,10 +191,10 @@ const ChatContent = () => {
                       className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[75%] px-5 py-3 shadow-md ${
+                        className={`max-w-[75%] px-5 py-3 shadow-lg ${
                           isMe
-                            ? 'bg-white text-gray-900 rounded-[24px] rounded-br-[4px]'
-                            : 'bg-primary/60 backdrop-blur-md text-white rounded-[24px] rounded-bl-[4px] border border-white/10'
+                            ? 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white rounded-[24px] rounded-br-[4px] shadow-violet-500/20'
+                            : 'glass-panel bg-white/5 backdrop-blur-md text-white rounded-[24px] rounded-bl-[4px] border-white/10'
                         }`}
                       >
                         <p className="text-[15px] leading-relaxed font-medium">{chat.message}</p>
