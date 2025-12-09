@@ -45,7 +45,7 @@ const UserLogin = () => {
 
       const data = await response.json();
       Cookies.set("authToken", data.token, { expires: 15 });
-      router.push("/landing");
+      router.push("/conversation");
     } catch (err: any) {
       setError(err.message || "An error occurred during login");
     } finally {
