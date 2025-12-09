@@ -128,7 +128,7 @@ const UserLogin = () => {
           <CardFooter className="flex justify-center">
             <p className="text-xs text-muted-foreground text-center text-foreground/40">
               Don&apos;t have an account?{" "}
-              <a href="/register" className="text-primary hover:underline hover:text-primary/80 transition-colors">
+              <a href="/createUser" className="text-primary hover:underline hover:text-primary/80 transition-colors">
                 Sign up
               </a>
             </p>
